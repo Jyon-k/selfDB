@@ -7,14 +7,23 @@
 using namespace std;
 
 struct Row{
-    uint32_t orderKey;
-    uint32_t custKey;
-    double totalPrice;
+    //uint32_t orderKey;
+    //uint32_t custKey;
+    //double totalPrice;
+    void** columns;
+};
+
+struct Schema{
+    char* name;
+    char* type;
+    //int columnNumber;
 };
 
 struct Table{
     char* tableName;
     Row* rowTable;
+    Schema* tableSchema;
+    int colSize;
     int rowSize;
 };
 

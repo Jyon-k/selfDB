@@ -1,10 +1,27 @@
 #include <iostream>
+#include <cstring>
 
 #include "selfDB_structs.h"
 
 using namespace std;
 
-void selectAll(Row* rowTable, int lineCount){
+void selectAll(Table* table){
+    int count = 0;
+    int colSize = table->colSize;
+    int rowSize = table->rowSize;
+
+    for(int row = 0; row < rowSize; ++row){
+        for(int col = 0; col < colSize; ++col){
+            cout << table->rowTable[row].columns[col];
+            if(col) cout << "|";
+        }
+        cout << endl;
+        ++count;
+    }
+
+    cout << count << " row(s) selected" << endl;
+
+    /*
     int count = 0;
     cout << "order key|cust key|total price"<<endl;
     for(int row = 0; row < lineCount; ++row){
@@ -14,9 +31,39 @@ void selectAll(Row* rowTable, int lineCount){
         ++count;
     }
     cout << count << " row(s) selected" << endl;
+    */
 }
 
-void selectGreater(Row* rowTable, int lineCount, double operand){
+void selectGreater(Table* table, const char* colName, const char*  operand){
+    int count = 0;
+    int colSize = table->colSize;
+    int rowSize = table->rowSize;
+
+    int selectedCol = -1;
+    for(int col = 0; col < colSize; ++col){
+        if(!strcmp(table->tableSchema[col].name, colName)){
+            selectedCol = col;
+            break;
+        }
+    }
+    if(selectedCol < 0){
+        cout << "No such column in table " << table->tableName << "!!" << endl;
+    }
+
+    for(int row = 0; row < rowSize; ++row){
+        if(table->rowTable[row].columns[selectedCol] > (void*)operand){
+            for(int col = 0; col < colSize; ++col){
+                cout << table->rowTable[row].columns[col];
+                if(col) cout << "|";
+            }
+            ++count;
+        }
+        cout << endl;
+    }
+
+    cout << count << " row(s) selected" << endl;
+
+    /*
     int count = 0;
     cout << "order key|cust key|total price"<<endl;
     for(int row = 0; row < lineCount; ++row){
@@ -28,9 +75,39 @@ void selectGreater(Row* rowTable, int lineCount, double operand){
         }
     }
     cout << count << " row(s) selected" << endl;
+    */
 }
 
-void selectGreaterEqual(Row* rowTable, int lineCount, double operand){
+void selectGreaterEqual(Table* table, const char* colName, const char* operand){
+    int count = 0;
+    int colSize = table->colSize;
+    int rowSize = table->rowSize;
+
+    int selectedCol = -1;
+    for(int col = 0; col < colSize; ++col){
+        if(!strcmp(table->tableSchema[col].name, colName)){
+            selectedCol = col;
+            break;
+        }
+    }
+    if(selectedCol < 0){
+        cout << "No such column in table " << table->tableName << "!!" << endl;
+    }
+
+    for(int row = 0; row < rowSize; ++row){
+        if(table->rowTable[row].columns[selectedCol] >= (void*)operand){
+            for(int col = 0; col < colSize; ++col){
+                cout << table->rowTable[row].columns[col];
+                if(col) cout << "|";
+            }
+            ++count;
+        }
+        cout << endl;
+    }
+
+    cout << count << " row(s) selected" << endl;
+
+    /*
     int count = 0;
     cout << "order key|cust key|total price"<<endl;
     for(int row = 0; row < lineCount; ++row){
@@ -42,9 +119,39 @@ void selectGreaterEqual(Row* rowTable, int lineCount, double operand){
         }
     }
     cout << count << " row(s) selected" << endl;
+    */
 }
 
-void selectLess(Row* rowTable, int lineCount, double operand){
+void selectLess(Table* table, const char* colName, const char*  operand){
+    int count = 0;
+    int colSize = table->colSize;
+    int rowSize = table->rowSize;
+
+    int selectedCol = -1;
+    for(int col = 0; col < colSize; ++col){
+        if(!strcmp(table->tableSchema[col].name, colName)){
+            selectedCol = col;
+            break;
+        }
+    }
+    if(selectedCol < 0){
+        cout << "No such column in table " << table->tableName << "!!" << endl;
+    }
+
+    for(int row = 0; row < rowSize; ++row){
+        if(table->rowTable[row].columns[selectedCol] < (void*)operand){
+            for(int col = 0; col < colSize; ++col){
+                cout << table->rowTable[row].columns[col];
+                if(col) cout << "|";
+            }
+            ++count;
+        }
+        cout << endl;
+    }
+
+    cout << count << " row(s) selected" << endl;
+
+    /*
     int count = 0;
     cout << "order key|cust key|total price"<<endl;
     for(int row = 0; row < lineCount; ++row){
@@ -56,9 +163,39 @@ void selectLess(Row* rowTable, int lineCount, double operand){
         }
     }
     cout << count << " row(s) selected" << endl;
+    */
 }
 
-void selectLessEqual(Row* rowTable, int lineCount, double operand){
+void selectLessEqual(Table* table, const char* colName, const char* operand){
+    int count = 0;
+    int colSize = table->colSize;
+    int rowSize = table->rowSize;
+
+    int selectedCol = -1;
+    for(int col = 0; col < colSize; ++col){
+        if(!strcmp(table->tableSchema[col].name, colName)){
+            selectedCol = col;
+            break;
+        }
+    }
+    if(selectedCol < 0){
+        cout << "No such column in table " << table->tableName << "!!" << endl;
+    }
+
+    for(int row = 0; row < rowSize; ++row){
+        if(table->rowTable[row].columns[selectedCol] <= (void*)operand){
+            for(int col = 0; col < colSize; ++col){
+                cout << table->rowTable[row].columns[col];
+                if(col) cout << "|";
+            }
+            ++count;
+        }
+        cout << endl;
+    }
+
+    cout << count << " row(s) selected" << endl;
+
+    /*
     int count = 0;
     cout << "order key|cust key|total price"<<endl;
     for(int row = 0; row < lineCount; ++row){
@@ -70,4 +207,5 @@ void selectLessEqual(Row* rowTable, int lineCount, double operand){
         }
     }
     cout << count << " row(s) selected" << endl;
+    */
 }

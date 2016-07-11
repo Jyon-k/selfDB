@@ -21,3 +21,17 @@ vector<string> split(const string &s){
     split(s, delim, elems);
     return elems;
 }
+
+int main(){
+
+    string tmp;
+    getline(cin, tmp);
+
+    vector<string> vtmp = split(tmp);
+
+    for(vector<string>::iterator it = vtmp.begin(); it!=vtmp.end(); ++it){
+        cout << (*it) << endl;
+    }
+
+    return 0;
+}
