@@ -66,7 +66,13 @@ int main(int argc, char* argv[]){
                     //database.push_back(create(ifs, tableName, lc));
                 //}
 
-                database.push_back(createTable(commandSet, tableName));
+                Table* newTable = createTable(commandSet, tableName);
+                for(int col = 0; col < newTable->colSize; ++col){
+                    cout << newTable->tableSchema[col].name << endl;
+                }
+                if(newTable != NULL){
+                    database.push_back(newTable);
+                }
             }
         }
         else if(!strcmp(command, LOAD)){

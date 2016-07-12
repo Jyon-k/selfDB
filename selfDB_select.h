@@ -5,6 +5,24 @@
 
 using namespace std;
 
+void printColumn(Table* table, int row, int col){
+    if(!strcmp(table->tableSchema[col].type, "int")){
+        cout << *((uint32_t*)(table->rowTable[row].columns[col]));
+    }
+    else if(!strcmp(table->tableSchema[col].type, "bigint")){
+        cout << *((uint64_t*)(table->rowTable[row].columns[col]));
+    }
+    else if(!strcmp(table->tableSchema[col].type, "char")){
+        cout << *((char*)(table->rowTable[row].columns[col]));
+    }
+    else if(!strcmp(table->tableSchema[col].type, "decimal")){
+        cout << *((float*)(table->rowTable[row].columns[col]));
+    }
+    else if(!strcmp(table->tableSchema[col].type, "double")){
+        cout << *((double*)(table->rowTable[row].columns[col]));
+    }
+}
+
 void selectAll(Table* table){
     int count = 0;
     int colSize = table->colSize;
@@ -12,8 +30,8 @@ void selectAll(Table* table){
 
     for(int row = 0; row < rowSize; ++row){
         for(int col = 0; col < colSize; ++col){
-            cout << table->rowTable[row].columns[col];
             if(col) cout << "|";
+            printColumn(table, row, col);
         }
         cout << endl;
         ++count;
@@ -53,8 +71,8 @@ void selectGreater(Table* table, const char* colName, const char*  operand){
     for(int row = 0; row < rowSize; ++row){
         if(table->rowTable[row].columns[selectedCol] > (void*)operand){
             for(int col = 0; col < colSize; ++col){
-                cout << table->rowTable[row].columns[col];
                 if(col) cout << "|";
+                printColumn(table, row, col);
             }
             ++count;
         }
@@ -97,8 +115,8 @@ void selectGreaterEqual(Table* table, const char* colName, const char* operand){
     for(int row = 0; row < rowSize; ++row){
         if(table->rowTable[row].columns[selectedCol] >= (void*)operand){
             for(int col = 0; col < colSize; ++col){
-                cout << table->rowTable[row].columns[col];
                 if(col) cout << "|";
+                printColumn(table, row, col);
             }
             ++count;
         }
@@ -141,8 +159,8 @@ void selectLess(Table* table, const char* colName, const char*  operand){
     for(int row = 0; row < rowSize; ++row){
         if(table->rowTable[row].columns[selectedCol] < (void*)operand){
             for(int col = 0; col < colSize; ++col){
-                cout << table->rowTable[row].columns[col];
                 if(col) cout << "|";
+                printColumn(table, row, col);
             }
             ++count;
         }
@@ -185,8 +203,8 @@ void selectLessEqual(Table* table, const char* colName, const char* operand){
     for(int row = 0; row < rowSize; ++row){
         if(table->rowTable[row].columns[selectedCol] <= (void*)operand){
             for(int col = 0; col < colSize; ++col){
-                cout << table->rowTable[row].columns[col];
                 if(col) cout << "|";
+                printColumn(table, row, col);
             }
             ++count;
         }
