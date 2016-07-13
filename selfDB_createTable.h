@@ -13,8 +13,6 @@ Schema* createSchema(vector<string> query){
 
     Schema* newSchema = new Schema[(query.size()-3)/2];
 
-    cout << (query.size()-3)/2 << endl;
-
     for(int i = 3; i < query.size(); ++i){
         if(i%2){
             if(!strcmp(query.at(i).c_str(), "int")){
@@ -68,35 +66,36 @@ Table* createTable(vector<string> query, const char* tableName){
     newRowTable->tableName = new char[strlen(tableName) + 1];
     strcpy(newRowTable->tableName, tableName);
     newRowTable->tableSchema = createSchema(query);
-    newRowTable->colSize = (query.size()-3)/2;
-}
-
-
-/*
-Table* create(ifstream &ifs, const char* tableName, int lineCount){
-
-    cout << "Create Table" << endl;
-
-    //actually read the line
-    Table* newRowTable = new Table;
-    Row* newTable = new Row[lineCount];
-
-    char delimeter;
-    for(int row = 0; row < lineCount; ++row){
-        ifs >> newTable[row].orderKey
-            >> delimeter
-            >> newTable[row].custKey
-            >> delimeter
-            >> newTable[row].totalPrice;
+    if(newRowTable-> tableSchema == NULL){
+        return NULL;
     }
-    cout << "Table is created : " << lineCount << "row(s)" << endl;
+    newRowTable->colSize = (query.size()-3)/2;
+    cout << "Create new table!" << endl;
+    for(int col = 0; col < newRowTable->colSize; ++col){
+        if(!col) cout << "-";
+        for(int i = 0; i < strlen(newRowTable->tableSchema[col].name)+3; ++i){
+            cout << "-";
+        }
+    }
+    cout << endl;
 
-    //newRowTable->tableName = tableName;
-    newRowTable->tableName = new char[strlen(tableName) + 1];
-    strcpy(newRowTable->tableName, tableName);
-    newRowTable->rowTable = newTable;
-    newRowTable->rowSize = lineCount;
+    cout << "| ";
+    for(int col = 0; col < newRowTable->colSize; ++col){
+        if(col) cout << " | ";
+        cout << newRowTable->tableSchema[col].name;
+    }
+    cout << " |";
+    cout << endl;
+
+    for(int col = 0; col < newRowTable->colSize; ++col){
+        if(!col) cout << "-";
+        for(int i = 0; i < strlen(newRowTable->tableSchema[col].name)+3; ++i){
+            cout << "-";
+        }
+    }
+    cout << endl;
 
     return newRowTable;
 }
-*/
+
+

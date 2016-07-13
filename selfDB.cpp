@@ -6,18 +6,21 @@
 #include <algorithm>
 
 #include "selfDB_structs.h"
-#include "selfDB_createTable.h"
-#include "selfDB_select.h"
 #include "selfDB_query.h"
+#include "selfDB_createTable.h"
 #include "selfDB_load.h"
+#include "selfDB_show.h"
+#include "selfDB_select.h"
 
 using namespace std;
 
 #define CREATE  "create"
 #define LOAD    "load"
-#define LIST    "list"
+#define SHOW    "show"
 #define SELECT  "select"
+#define INSERT  "insert"
 #define QUIT    "quit"
+#define EXIT    "exit"
 
 int main(int argc, char* argv[]){
 
@@ -35,50 +38,29 @@ int main(int argc, char* argv[]){
             cout << endl;
             continue;
         }
-        vector<string> commandSet = split(cmd_tmp);
-        const char* command = commandSet.at(0).c_str();
+        vector<string> query = split(cmd_tmp);
+        const char* command = query.at(0).c_str();
 
         if(!strcmp(command, CREATE)){
-            const char* type = commandSet.at(1).c_str();
+            const char* type = query.at(1).c_str();
             if(!strcmp(type, "database")){
             }
             else if(!strcmp(type, "table")){
-                //string tbl_tmp;
-                //string TBN_tmp;
-                //cout << "CSV file : ";
-                //cin >> tbl_tmp;
-                //cout << "Table name : ";
-                //cin >> TBN_tmp;
+                const char* tableName = query.at(2).c_str();
 
-                const char* tableName = commandSet.at(2).c_str();
-
-                //ifstream ifs;
-                //ifs.open(table);
-
-                //int lc = count(istreambuf_iterator<char>(ifs), istreambuf_iterator<char>(), '\n');
-                //ifs.close();
-                //ifs.open(table);
-
-                //if(!ifs){
-                //    cout << "Input file is empty!" << endl;
-                //}
-                //else{
-                    //database.push_back(create(ifs, tableName, lc));
-                //}
-
-                Table* newTable = createTable(commandSet, tableName);
-                for(int col = 0; col < newTable->colSize; ++col){
-                    cout << newTable->tableSchema[col].name << endl;
-                }
-                if(newTable != NULL){
-                    database.push_back(newTable);
-                }
+                Table* newTable = createTable(query, tableName);
+                if(newTable != NULL)    database.push_back(newTable);
+                else                    continue;
+            }
+            else{
+                cout << "Wrong command!!" << endl;
+                continue;
             }
         }
         else if(!strcmp(command, LOAD)){
-            const char* tableName = commandSet.at(1).c_str();
-            const char* with = commandSet.at(2).c_str();
-            const char* CSV = commandSet.at(3).c_str();
+            const char* tableName = query.at(1).c_str();
+            const char* with = query.at(2).c_str();
+            const char* CSV = query.at(3).c_str();
 
             if(strcmp(with, "with")){
                 cout << "Wrong command!!" << endl;
@@ -94,6 +76,7 @@ int main(int argc, char* argv[]){
 
             if(!ifs){
                 cout << "Input file is empty!" << endl;
+                continue;
             }
             else{
                 Table* selectedTable;
@@ -106,9 +89,32 @@ int main(int argc, char* argv[]){
                 loadCSV(ifs, selectedTable, lc);
             }
         }
-        else if(!strcmp(command, LIST)){
-            for(vector<Table*>::iterator it = database.begin(); it != database.end(); ++it){
-                cout << (*it)->tableName << endl;
+        else if(!strcmp(command, SHOW)){
+            if(!strcmp(query.at(1).c_str(), "databases")){
+                showDatabases(query);
+            }
+            else if(!strcmp(query.at(1).c_str(), "tables")){
+                showTables(query, database);
+            }
+            else if(!strcmp(query.at(1).c_str(), "schema")){
+                if(query.size() < 3){
+                    cout << "Wrong command!!" << endl;
+                    continue;
+                }
+
+                const char* tableName = query.at(2).c_str();
+                Table* selectedTable;
+                for(vector<Table*>::iterator it = database.begin(); it != database.end(); ++it){
+                    if(!strcmp((*it)->tableName, tableName)){
+                        selectedTable = (*it);
+                        break;
+                    }
+                }
+                showSchema(query, selectedTable);
+            }
+            else{
+                cout << "Wrong command!!" << endl;
+                continue;
             }
         }
         else if(!strcmp(command, SELECT)){
@@ -116,13 +122,27 @@ int main(int argc, char* argv[]){
                 cout << "No table exists!!" << endl;
                 continue;
             }
-            if(commandSet.size() < 4 || strcmp(commandSet.at(2).c_str(), "from")){
+            if(query.size() < 4){
                 cout << "Wrong command!!" << endl;
                 continue;
             }
 
-            const char* column = commandSet.at(1).c_str();
-            const char* tableName = commandSet.at(3).c_str();
+            int fromCount = 0;
+            for(vector<string>::iterator it = query.begin(); it != query.end(); ++it){
+                if(!strcmp((*it).c_str(), "from"))  break;
+                ++fromCount;
+            }
+            bool isWhere = 0;
+            int whereCount = 0;
+            for(vector<string>::iterator it = query.begin(); it != query.end(); ++it){
+                if(!strcmp((*it).c_str(), "where")){
+                    isWhere = 1;
+                    break;
+                }
+                ++whereCount;
+            }
+
+            const char* tableName = query.at(fromCount + 1).c_str();
 
             Table* selectedTable;
             for(vector<Table*>::iterator it = database.begin(); it != database.end(); ++it){
@@ -131,153 +151,41 @@ int main(int argc, char* argv[]){
                     break;
                 }
             }
-            /*
-            Row* rowTable;
-            int lc;
-            for(vector<Table*>::iterator it = database.begin(); it != database.end(); ++it){
-               if(strcmp(tableName, (*it)->tableName) == 0){
-                    rowTable = (*it)->rowTable;
-                   lc = (*it)->rowSize;
-                }
-            }
-            */
 
-
-            if(!strcmp(column, "all") || !strcmp(column, "*")){
-                if(commandSet.size() == 4){
-                    selectAll(selectedTable);
-
-                    //selectAll(rowTable, lc);
-                }
-                else{
-                    if(commandSet.size() < 8 || strcmp(commandSet.at(4).c_str(), "where")){
-                        cout << "Wrong command!!" << endl;
-                        continue;
-                    }
-
-                    const char* selectedColumn = commandSet.at(5).c_str();
-                    const char* selectOperand = commandSet.at(7).c_str();
-                    const char* selectOperator = commandSet.at(6).c_str();
-                    if(!strcmp(selectOperator, ">")){
-                        selectGreater(selectedTable, selectedColumn, selectOperand);
-                    }
-                    else if(!strcmp(selectOperator, ">=")){
-                        selectGreaterEqual(selectedTable, selectedColumn, selectOperand);
-                    }
-                    else if(!strcmp(selectOperator, "<")){
-                        selectLess(selectedTable, selectedColumn, selectOperand);
-                    }
-                    else if(!strcmp(selectOperator, "<=")){
-                        selectLessEqual(selectedTable, selectedColumn, selectOperand);
-                    }
-                    else{
-                        cout << "Wrong Operator!!" << endl;
-                    }
-
-
-                    /*
-                    if(!strcmp(selectedColumn, "orderKey")){
-                        cout << "Sorry, not yet provided..." << endl;
-
-                    }
-                    else if(!strcmp(selectedColumn, "custKey")){
-                        cout << "Sorry, not yet provided..." << endl;
-                    }
-                    else if(!strcmp(selectedColumn, "totalPrice")){
-                        double selectOperand = stod(commandSet.at(7));
-                        const char* selectOperator = commandSet.at(6).c_str();
-                        if(!strcmp(selectOperator, ">")){
-                            selectGreater(rowTable, lc, selectOperand);
-                        }
-                        else if(!strcmp(selectOperator, ">=")){
-                            selectGreaterEqual(rowTable, lc, selectOperand);
-                        }
-                        else if(!strcmp(selectOperator, "<")){
-                            selectLess(rowTable, lc, selectOperand);
-                        }
-                        else if(!strcmp(selectOperator, "<=")){
-                            selectLessEqual(rowTable, lc, selectOperand);
-                        }
-                        else{
-                            cout << "Wrong Operator!!" << endl;
-                        }
-                    }
-                    else{
-                        cout << "There is no such comlumn!!" << endl;
-                    }
-                    */
-                }
-            }
-            else if(!strcmp(column, "orderKey")){
-                cout << "Sorry, not yet provided..." << endl;
-            }
-            else if(!strcmp(column, "custKey")){
-                cout << "Sorry, not yet provided..." << endl;
-            }
-            else if(!strcmp(column, "totalPrice")){
-                cout << "Sorry, not yet provided..." << endl;
+            if(!isWhere){
+                selectAll(query, selectedTable);
             }
             else{
-                cout << "There is no such comlumn!!" << endl;
-            }
-            /*
-            string TBN_tmp;
-            cout << "Table Name : ";
-            cin >> TBN_tmp;
-            const char* tableName = TBN_tmp.c_str();
-
-            bool flag = 0;
-            for(vector<Table*>::iterator it = database.begin(); it != database.end(); ++it){
-                if(strcmp(tableName, (*it)->tableName) == 0){
-                    flag = 1;
+                if(query.size() < whereCount + 4){
+                    cout << query.size() << endl;
+                    cout << "Wrong command!!" << endl;
+                    continue;
                 }
-            }
 
-            if(!flag){
-                cout << "No such table!!" << endl;
-                continue;
-            }
-
-            Row* rowTable;
-            int lc;
-            for(vector<Table*>::iterator it = database.begin(); it != database.end(); ++it){
-               if(strcmp(tableName, (*it)->tableName) == 0){
-                    rowTable = (*it)->rowTable;
-                   lc = (*it)->rowSize;
-                }
-            }
-
-            string sop_tmp;
-            coiut << "Operator : ";
-            cin >> sop_tmp;
-            const char* selectOperator = sop_tmp.c_str();
-
-            if(strcmp(selectOperator, "all") == 0){
-                selectAll(rowTable, lc);
-            }
-            else{
-                double selectOperand;
-                cout << "Double value : ";
-                cin >> selectOperand;
+                const char* selectedColumn = query.at(whereCount + 1).c_str();
+                const char* selectOperator = query.at(whereCount + 2).c_str();
+                const char* selectOperand = query.at(whereCount + 3).c_str();
                 if(!strcmp(selectOperator, ">")){
-                    selectGreater(rowTable, lc, selectOperand);
+                    selectGreater(query, selectedTable, selectedColumn, selectOperand);
                 }
                 else if(!strcmp(selectOperator, ">=")){
-                    selectGreaterEqual(rowTable, lc, selectOperand);
+                    selectGreaterEqual(query, selectedTable, selectedColumn, selectOperand);
                 }
                 else if(!strcmp(selectOperator, "<")){
-                    selectLess(rowTable, lc, selectOperand);
+                    selectLess(query, selectedTable, selectedColumn, selectOperand);
                 }
                 else if(!strcmp(selectOperator, "<=")){
-                    selectLessEqual(rowTable, lc, selectOperand);
+                    selectLessEqual(query, selectedTable, selectedColumn, selectOperand);
                 }
                 else{
                     cout << "Wrong Operator!!" << endl;
+                    continue;
                 }
             }
-            */
         }
-        else if(!strcmp(command, QUIT)){
+        else if(!strcmp(command, INSERT)){
+        }
+        else if(!strcmp(command, QUIT)||!strcmp(command, EXIT)){
             cout << "******************************" << endl;
             cout << "*********quit selfDB**********" << endl;
             cout << "******************************" << endl;
@@ -285,6 +193,7 @@ int main(int argc, char* argv[]){
         }
         else{
             cout << "WRONG COMMAND!!" << endl;
+            continue;
         }
     }
 
