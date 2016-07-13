@@ -70,6 +70,8 @@ Table* createTable(vector<string> query, const char* tableName){
         return NULL;
     }
     newRowTable->colSize = (query.size()-3)/2;
+
+
     cout << "Create new table!" << endl;
     for(int col = 0; col < newRowTable->colSize; ++col){
         if(!col) cout << "-";

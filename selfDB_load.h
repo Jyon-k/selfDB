@@ -6,6 +6,10 @@
 
 using namespace std;
 
+void loadCSVwithSegment(ifstream &ifs, Table* rowTable, int lineCount){
+
+}
+
 void loadCSV(ifstream &ifs, Table* rowTable, int lineCount){
 
     Row* newTable = new Row[lineCount];

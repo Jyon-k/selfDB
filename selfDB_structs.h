@@ -6,52 +6,37 @@
 
 using namespace std;
 
+struct Header{
+    int count;
+    int size;
+};
+
 struct Row{
-    //uint32_t orderKey;
-    //uint32_t custKey;
-    //double totalPrice;
     void** columns;
+};
+
+struct Page{
+    Header* header;
+    Row* record;
+};
+
+struct Segment{
+    Header* header;
+    Page** segmentPage;
 };
 
 struct Schema{
     char* name;
     char* type;
-    //int columnNumber;
 };
 
 struct Table{
     char* tableName;
     Row* rowTable;
+    Segment* tableSegment;
     Schema* tableSchema;
     int colSize;
     int rowSize;
 };
 
-/*
-class Database{
-    private:
-        char* DBName;
-        Table* tableSet;
-        Database* nextDB;
-    public:
-        Database();
-        Database(char* DBName);
-        ~Database();
-        void setDBName();
-        bool find();
-        Row* getTable();
-        void createTable();
-};
-
-class DatabaseSet{
-    private:
-        Database* DBset;
-    public:
-        DatabaseSet();
-        ~DatabaseSet();
-        void insert();
-        bool find();
-        Database* getDB();
-};
-*/
 #endif
