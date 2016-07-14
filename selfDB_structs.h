@@ -4,11 +4,21 @@
 #include <iostream>
 #include <cstdint>
 
+#define PAGE_MAX_BYTE   16*1024       //16KB
+#define SEG_MAX_RECS    1*1024*1024   //1M
+
 using namespace std;
 
-struct Header{
-    int count;
-    int size;
+struct HeaderSeg{
+    int currentRecords;
+    int maxPages;
+    int recordsPerPage;
+};
+
+struct HeaderPage{
+    int recordBytes;
+    int maxRecords;
+    int currentRecords;
 };
 
 struct Row{
@@ -16,12 +26,12 @@ struct Row{
 };
 
 struct Page{
-    Header* header;
+    HeaderPage header;
     Row* record;
 };
 
 struct Segment{
-    Header* header;
+    HeaderSeg header;
     Page** segmentPage;
 };
 
@@ -32,7 +42,7 @@ struct Schema{
 
 struct Table{
     char* tableName;
-    Row* rowTable;
+    //Row* rowTable;
     Segment* tableSegment;
     Schema* tableSchema;
     int colSize;

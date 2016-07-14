@@ -6,23 +6,23 @@
 
 using namespace std;
 
-void printColumn(Table* table, int row, int col){
+void printColumn(Table* table, Row currentRec, int col){
     if(col) cout << "|";
 
     if(!strcmp(table->tableSchema[col].type, "int")){
-        cout << *(uint32_t*)(table->rowTable[row].columns[col]);
+        cout << *(uint32_t*)(currentRec.columns[col]);
     }
     else if(!strcmp(table->tableSchema[col].type, "bigint")){
-        cout << *(uint64_t*)(table->rowTable[row].columns[col]);
+        cout << *(uint64_t*)(currentRec.columns[col]);
     }
     else if(!strcmp(table->tableSchema[col].type, "char")){
-        cout << *(char*)(table->rowTable[row].columns[col]);
+        cout << *(char*)(currentRec.columns[col]);
     }
     else if(!strcmp(table->tableSchema[col].type, "decimal")){
-        cout << *(float*)(table->rowTable[row].columns[col]);
+        cout << *(float*)(currentRec.columns[col]);
     }
     else if(!strcmp(table->tableSchema[col].type, "double")){
-        cout << *(double*)(table->rowTable[row].columns[col]);
+        cout << *(double*)(currentRec.columns[col]);
     }
 }
 
@@ -31,15 +31,32 @@ void selectAll(vector<string> query, Table* table){
     int colSize = table->colSize;
     int rowSize = table->rowSize;
 
+    int recordSize = table->colSize * 4;
+    int pageMaxRec = PAGE_MAX_BYTE/recordSize;
+
     if(!strcmp(query.at(1).c_str(),"all")){
         for(int i = 0; i < table->colSize; ++i){
             if(i)    cout << "|";
             cout << table->tableSchema[i].name;
         }
         cout << endl;
+
         for(int row = 0; row < rowSize; ++row){
+            int curSegIndex = row/SEG_MAX_RECS;
+            int curPageIndex = row%SEG_MAX_RECS;
+            int curRecIndex = curPageIndex%pageMaxRec;
+
+            cout << row << endl;
+            Segment tmpSeg = table->tableSegment[curSegIndex];
+            cout << "Segement called" << endl;
+            Page* tmpPage = tmpSeg.segmentPage[curPageIndex];
+            cout << "Page called" << endl;
+            Row currentRec = tmpPage->record[curRecIndex];
+            cout << "Row called" << endl;
+
             for(int colIterator = 0; colIterator < table->colSize; ++colIterator){
-                printColumn(table, row, colIterator);
+                //printColumn(table, row, colIterator);
+                printColumn(table, currentRec, colIterator);
             }
             cout << endl;
             ++count;
@@ -74,10 +91,15 @@ void selectAll(vector<string> query, Table* table){
         cout << endl;
 
         for(int row = 0; row < rowSize; ++row){
+            int curSegIndex = row/SEG_MAX_RECS;
+            int curPageIndex = row%SEG_MAX_RECS;
+            int curRecIndex = row%pageMaxRec;
+
+            Row currentRec = table->tableSegment[curSegIndex].segmentPage[curPageIndex]->record[curRecIndex];
             int col = 0;
             for(int colIterator = 0; colIterator < fromCount-1; ++colIterator){
                 col = colList[colIterator];
-                printColumn(table, row, col);
+                printColumn(table, currentRec, col);
             }
             cout << endl;
             ++count;
@@ -85,7 +107,7 @@ void selectAll(vector<string> query, Table* table){
     }
     cout << count << " row(s) selected" << endl;
 }
-
+/*
 void selectGreater(vector<string> query, Table* table, const char* colName, const char*  operand){
     int count = 0;
     int colSize = table->colSize;
@@ -801,3 +823,4 @@ void selectLessEqual(vector<string> query, Table* table, const char* colName, co
     }
     cout << count << " row(s) selected" << endl;
 }
+*/
