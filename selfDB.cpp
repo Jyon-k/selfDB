@@ -166,16 +166,16 @@ int main(int argc, char* argv[]){
                 const char* selectOperator = query.at(whereCount + 2).c_str();
                 const char* selectOperand = query.at(whereCount + 3).c_str();
                 if(!strcmp(selectOperator, ">")){
-                    //selectGreater(query, selectedTable, selectedColumn, selectOperand);
+                    selectGreater(query, selectedTable, selectedColumn, selectOperand);
                 }
                 else if(!strcmp(selectOperator, ">=")){
-                    //selectGreaterEqual(query, selectedTable, selectedColumn, selectOperand);
+                    selectGreaterEqual(query, selectedTable, selectedColumn, selectOperand);
                 }
                 else if(!strcmp(selectOperator, "<")){
-                    //selectLess(query, selectedTable, selectedColumn, selectOperand);
+                    selectLess(query, selectedTable, selectedColumn, selectOperand);
                 }
                 else if(!strcmp(selectOperator, "<=")){
-                    //selectLessEqual(query, selectedTable, selectedColumn, selectOperand);
+                    selectLessEqual(query, selectedTable, selectedColumn, selectOperand);
                 }
                 else{
                     cout << "Wrong Operator!!" << endl;

@@ -4,8 +4,8 @@
 #include <iostream>
 #include <cstdint>
 
-#define PAGE_MAX_BYTE   16*1024       //16KB
-#define SEG_MAX_RECS    1*1024*1024   //1M
+const int PAGE_MAX_BYTE = 16*1024;       //16KB
+const int SEG_MAX_RECS = 1*1024*1024;   //1M
 
 using namespace std;
 
